@@ -1,13 +1,5 @@
 function points = cornerDetector(image, displayCorners, displayHough)
-% Find corners in original image
-% The input arguments are:
-%    image = original image to be filtered
-%    displayCorners = whether to display image with plotted 4 corners
-%    displayHough   = whether to display image with lines from Hough transform 
-% The output argument is:
-%    points = array of (x,y) coordinates of the 4 corners detected
 
-%% convert to grayscale, lowpass filter, edge filter
 I = rgb2gray(image);
 I = imgaussfilt(I,2);
 BW = edge(I, 'Canny', 0.5);

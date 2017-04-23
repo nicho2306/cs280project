@@ -1,8 +1,9 @@
 clear all, close all
-
-name = '1';
+% Input image
+name = '8';
 image = imread(['./pictures/' name '.jpg']);
 
+% Process the image
 processed = scanner(image, 1);
 
 figure
