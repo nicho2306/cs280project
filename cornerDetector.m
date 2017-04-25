@@ -9,7 +9,7 @@ function points = cornerDetector(image, displayCorners, displayHough)
 
 %% convert to grayscale, lowpass filter, edge filter
 I = rgb2gray(image);
-I = imgaussfilt(I,2);
+I = imgaussfilt(I,2.5);
 BW = edge(I, 'Canny', 0.3);
 
 %% Hough transform
@@ -119,5 +119,6 @@ if displayCorners
     imshow(image)
     hold on
     plot(points(1,:),points(2,:),'rx','markersize', 30, 'linewidth',5)
+   
 end
 end
