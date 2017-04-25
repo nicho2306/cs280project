@@ -1,8 +1,9 @@
 clear all, close all
 % Input image
-name = '09';
+name = '16';
 image = imread(['./pictures/' name '.jpg']);
-%image = imresize(image, 0.5);
+imshow(image);
+title(name)
 %%
 % Process the image
 processed = scanner(image, 1);
