@@ -1,9 +1,7 @@
 clear all, close all
 % Input image
-name = '16';
+name = '11';
 image = imread(['./pictures/' name '.jpg']);
-imshow(image);
-title(name)
 %%
 % Process the image
 processed = scanner(image, 1);
