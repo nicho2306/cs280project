@@ -10,7 +10,7 @@ function points = cornerDetector(image, displayCorners, displayHough)
 %% convert to grayscale, lowpass filter, edge filter
 I = rgb2gray(image);
 I = imgaussfilt(I,2);
-BW = edge(I, 'Canny', 0.5);
+BW = edge(I, 'Canny', 0.3);
 
 %% Hough transform
 [H,T,R] = hough(BW);
@@ -58,6 +58,8 @@ X1 = lines(i).point1'; %(x1,y1)'
 X2 = lines(i).point2'; %(x2,y2)'
 eq(:,4) = [-(X2(2)-X1(2))/(X2(1)-X1(1)); 1; (X2(2)-X1(2))/(X2(1)-X1(1))*X1(1) - X1(2)];
 
+
+
 %% Find intersection of lines (corners)
 points = zeros(2,4);   % first row: x-coordinate of the points, second row: y-coordinate
 for i = 1:1:length(eq)
@@ -87,15 +89,15 @@ if displayHough
         xy = [lines(k).point1; lines(k).point2];
         plot(xy(:,1),xy(:,2),'LineWidth',2,'Color','green');
         % Plot beginnings and ends of lines
-        plot(xy(1,1),xy(1,2),'x','LineWidth',2,'Color','yellow');
-        plot(xy(2,1),xy(2,2),'x','LineWidth',2,'Color','red');
+        plot(xy(1,1),xy(1,2),'x','LineWidth',2,'markersize', 20, 'Color','yellow');
+        plot(xy(2,1),xy(2,2),'x','LineWidth',2,'markersize', 20, 'Color','red');
     end
 end
-
+%%
 if displayCorners
     figure
     imshow(image)
     hold on
-    plot(points(1,:),points(2,:),'x','markersize', 30, 'linewidth',5)
+    plot(points(1,:),points(2,:),'rx','markersize', 30, 'linewidth',5)
 end
 end

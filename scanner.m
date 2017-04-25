@@ -12,7 +12,7 @@ points = cornerDetector(image, false, false);
 
 %% Constraint the corner
 lengthX = round(points(1,2) - points(1,3)) + 1;
-lengthY = round(1.4*lengthX); %round(1.1*(points(2,2) - points(2,1))) + 1;
+lengthY = round(1.3*lengthX); %round(1.1*(points(2,2) - points(2,1))) + 1;
 x4 = 1;
 y4 = 1;
 x1 = x4 + lengthX;
