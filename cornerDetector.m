@@ -88,7 +88,7 @@ for ii =1:5000
     end
     
     % check whether these points are better candidates for corners
-    % area cannot be too big, all points within the image
+    % area cannot be too big, all points must be within the image pixels
     area = polyarea(points(1,:), points(2,:));
     if area > max_area && ~isnan(area) && ~any(any((points<0))) && ...
             ~any(points(1,:)>size(image,2)) && ~any(points(2,:)>size(image,1)) 
