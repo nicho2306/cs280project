@@ -1,4 +1,4 @@
-function target = scanner(image, angle)
+function target = scanner(image, displayFigures)
 % Find corners in original image, and transform using homography
 % The input arguments are:
 %    image = original image to be transformed
@@ -8,7 +8,7 @@ function target = scanner(image, angle)
 
 
 %% Find corners
-points = cornerDetector(image, false, false);
+points = cornerDetector(image, displayFigures);
 
 %% Constraint the corner
 lengthX = round(points(1,2) - points(1,3)) + 1;

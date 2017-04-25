@@ -1,4 +1,4 @@
-function points = cornerDetector(image, displayCorners, displayHough)
+function points = cornerDetector(image, displayFigures)
 % Find corners in original image
 % The input arguments are:
 %    image = original image to be filtered
@@ -21,8 +21,8 @@ LINES = houghlines(BW,T,R,P, 'FillGap',10000000000,'MinLength',1);
 max_area = 0;
 max_points = zeros(2,4);
 
-% random sample 5000 times
-for ii =1:5000
+% random sample ~210 combinations of 10 lines
+for ii =1:1000
     % randomly get 4 candidate lines
     possibleK = 1:size(LINES,2);
     K = datasample(possibleK, 4,'Replace',false);
@@ -101,7 +101,11 @@ points = max_points;
 
 %% Plot Hough lines & corners
 
-if displayHough
+if displayFigures
+    figure
+    imshow(BW)
+    title('edges of image')
+    
     figure
     imshow(BW)
     hold on
@@ -112,13 +116,22 @@ if displayHough
         plot(xy(1,1),xy(1,2),'x','LineWidth',2,'markersize', 20, 'Color','yellow');
         plot(xy(2,1),xy(2,2),'x','LineWidth',2,'markersize', 20, 'Color','red');
     end
-end
-%%
-if displayCorners
+    title('image with multiple line candidates')
+    
     figure
     imshow(image)
     hold on
     plot(points(1,:),points(2,:),'rx','markersize', 30, 'linewidth',5)
+    hold on
+    plot(points(1,1:2),points(2,1:2),'Color','green','LineWidth',3)
+    hold on
+    plot(points(1,2:3),points(2,2:3),'Color','green','LineWidth',3)
+    hold on
+    plot(points(1,3:4),points(2,3:4),'Color','green','LineWidth',3)
+    hold on
+    plot([points(1,4),points(1,1)],[points(2,4),points(2,1)],...
+        'Color','green','LineWidth',3)
+    title('image with corners')
    
 end
 end
