@@ -1,19 +1,18 @@
-function error = computeError(cPoints, dPoints)
+function good_prediction = computeError(cPoints, dPoints, r_threshold)
 % Compute L-2 norm error between cornerDetector and data set points
 % The input arguments are:
 %    cPoints = (x,y) points from cornerDetector
 %    dPoints = (x,y) points from dataset
+%    r_threshold = margin radius of error per corner
 % The output argument is:
-%    error = L-2 norm error sqrt((x_c - x_d)^2 + (y_c - y_d)^2)
+%    good_prediction = boolean of whether predicted corners are good enough
 
-error = 0;
-
+distances = 999*ones(1,4);
 for i=1:4
-    for j = 1:2
-        error = error + ((cPoints(i,j) - dPoints(i,j))^2);
-    end
+    distances(i) = sqrt((cPoints(1,i) - dPoints(1,i))^2 + (cPoints(2,i) - dPoints(2,i))^2);
 end
 
-error = sqrt(error);
+good_prediction = ~any(distances > r_threshold);
+
 end
 
