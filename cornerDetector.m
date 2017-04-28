@@ -9,8 +9,8 @@ function points = cornerDetector(image, displayFigures)
 
 %% convert to grayscale, lowpass filter, edge filter
 I = rgb2gray(image);
-I = imgaussfilt(I,2.5);
 %I = medfilt2(I);
+I = imgaussfilt(I,2.5);
 BW = edge(I, 'Canny', 0.3);
 
 %% Hough transform
