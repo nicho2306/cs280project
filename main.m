@@ -29,7 +29,7 @@ accuracy = good_counts/(num_images + 1)
 
 %%
 close all
-i = 0; % choose an index for the image to load
+i = 48; % choose an index for the image to load
 name = int2str(i);
 image = imread(['./pictures/' name '.jpg']);
 cornerDetector(image, true);
