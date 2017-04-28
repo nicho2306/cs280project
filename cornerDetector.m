@@ -8,132 +8,118 @@ function points = cornerDetector(image, displayFigures)
 %    points = array of (x,y) coordinates of the 4 corners detected
 
 %% convert to grayscale, lowpass filter, edge filter
-I = rgb2gray(image);
-I = imgaussfilt(I,2.5);
-%I = medfilt2(I);
-BW = edge(I, 'Canny', 0.3);
+LINES = 0;
+threshold = 0.3;
+gthreshold= 2.5;
+% If hough transform return less than 4 lines, reduce threshold for canny
+% edge detector, and try again
+while size(LINES,2) < 4
+    I = rgb2gray(image);
+    %I = medfilt2(I);
+    I = imgaussfilt(I,gthreshold);
+    BW = edge(I, 'Canny', threshold);
 
-%% Hough transform
-[H,T,R] = hough(BW);
-P = houghpeaks(H,10,'threshold',ceil(0.3*max(H(:))));
-LINES = houghlines(BW,T,R,P, 'FillGap',10000000000,'MinLength',1);
+    % Hough transform
+    [H,T,R] = hough(BW);
+    P = houghpeaks(H,10,'threshold',ceil(threshold*max(H(:))));
+    LINES = houghlines(BW,T,R,P, 'FillGap',1000000000,'MinLength',5);
+    threshold = threshold/2;
+    gthreshold = 1.5*gthreshold;
+    figure
+    imshow(BW)
+    title(['LINES = ' int2str(size(LINES,2))])
+end
 
 %% Find equation of lines
-
+max_area = 0;
+max_points = zeros(2,4);
 
 % random sample ~210 combinations of 10 lines
-   
-    eq = zeros(3, 4); % The outest lines
-    eq2 = zeros(3, 4); % The second outest lines
-    sumX = zeros(1, length(LINES));
-    sumY = zeros(1, length(LINES));
+for ii =1:100
+    % randomly get 4 candidate lines
+    possibleK = 1:size(LINES,2);
+    K = datasample(possibleK, 4,'Replace',false);
+    K = [1,2, 3, 7];
+    lines = LINES(K);
     
-    for k = 1:1:length(LINES)
-        X1 = LINES(k).point1'; %(x1,y1)'
-        X2 = LINES(k).point2'; %(x2,y2)'
+    eq = zeros(3,length(lines));
+    sumX = zeros(1, 4);
+    sumY = zeros(1, 4);
+    for k=1:4
+        X1 = lines(k).point1'; %(x1,y1)'
+        X2 = lines(k).point2'; %(x2,y2)'
         sumX(k) = X1(1) + X2(1);
         sumY(k) = X1(2) + X2(2);
     end
     
-    lines = LINES;
     % The top horizontal line
     i = find(sumY == min(sumY));
+    i = i(randi(length(i)));
     X1 = lines(i).point1'; %(x1,y1)'
     X2 = lines(i).point2'; %(x2,y2)'
     eq(:,1) = [-(X2(2)-X1(2))/(X2(1)-X1(1)); 1; (X2(2)-X1(2))/(X2(1)-X1(1))*X1(1) - X1(2)];
-    % Second uppest line
-    sumYY = sumY;
-    sumYY(i) = [];
-    i = find(sumYY == min(sumYY));
-    X1 = lines(i).point1'; %(x1,y1)'
-    X2 = lines(i).point2'; %(x2,y2)'
-    eq2(:,1) = [-(X2(2)-X1(2))/(X2(1)-X1(1)); 1; (X2(2)-X1(2))/(X2(1)-X1(1))*X1(1) - X1(2)];
     
     % The right vertical line
     i = find(sumX == max(sumX));
+    i = i(randi(length(i)));
     X1 = lines(i).point1'; %(x1,y1)'
     X2 = lines(i).point2'; %(x2,y2)'
+    % do this if line is exactly vertical
+    if X1(1) == X2(1) 
+        X1 = X1 + 1;
+    end
     eq(:,2) = [-(X2(2)-X1(2))/(X2(1)-X1(1)); 1; (X2(2)-X1(2))/(X2(1)-X1(1))*X1(1) - X1(2)];
-    % Second rightmost line
-    sumXX = sumX;
-    sumXX(i) = [];
-    i = find(sumXX == max(sumXX));
-    X1 = lines(i).point1'; %(x1,y1)'
-    X2 = lines(i).point2'; %(x2,y2)'
-    eq2(:,2) = [-(X2(2)-X1(2))/(X2(1)-X1(1)); 1; (X2(2)-X1(2))/(X2(1)-X1(1))*X1(1) - X1(2)];
     
     % The bottom horizontal line
     i = find(sumY == max(sumY));
+    i = i(randi(length(i)));
     X1 = lines(i).point1'; %(x1,y1)'
     X2 = lines(i).point2'; %(x2,y2)'
     eq(:,3) = [-(X2(2)-X1(2))/(X2(1)-X1(1)); 1; (X2(2)-X1(2))/(X2(1)-X1(1))*X1(1) - X1(2)];
-    % The second lowest line
-    sumYY = sumY;
-    sumYY(i) = [];
-    i = find(sumYY == max(sumYY));
-    X1 = lines(i).point1'; %(x1,y1)'
-    X2 = lines(i).point2'; %(x2,y2)'
-    eq2(:,3) = [-(X2(2)-X1(2))/(X2(1)-X1(1)); 1; (X2(2)-X1(2))/(X2(1)-X1(1))*X1(1) - X1(2)];
     
     % The left vertical line
     i = find(sumX == min(sumX));
+    i = i(randi(length(i)));
     X1 = lines(i).point1'; %(x1,y1)'
     X2 = lines(i).point2'; %(x2,y2)'
-    eq(:,4) = [-(X2(2)-X1(2))/(X2(1)-X1(1)); 1; (X2(2)-X1(2))/(X2(1)-X1(1))*X1(1) - X1(2)];
-    % The second leftmost line
-    sumXX = sumX;
-    sumXX(i) = [];
-    i = find(sumXX == min(sumXX));
-    X1 = lines(i).point1'; %(x1,y1)'
-    X2 = lines(i).point2'; %(x2,y2)'
-    eq2(:,4) = [-(X2(2)-X1(2))/(X2(1)-X1(1)); 1; (X2(2)-X1(2))/(X2(1)-X1(1))*X1(1) - X1(2)];
-    
-    cell(1, :, :) = eq;
-    cell(2, :, :) = eq2;
-    allPoints = zeros(32, 4); % each two rows, and 4 columns is a combination of the points for the corners
-    allAreas = zeros(1, 16); % 16 combinations in total
-    
-    % Find the combination of the two outest lines at the top, right,
-    % bottom, and left. Calculate the area, and find the combination that
-    % gives the biggest areas.
-    num = 1;
-    for a = 1:1:2
-        for b = 1:1:2
-            for c = 1:1:2
-                for d = 1:1:2
-                    Eq = [cell(a, :, 1)', cell(b, :, 2)', cell(c, :, 3)', cell(d, :, 4)'];
-                    % Find intersection of lines (corners) between the 4 random candidates
-                    points = zeros(2,4);   % first row: x-coordinate of the points, second row: y-coordinate
-                    for i = 1:1:length(Eq)     
-                        if i ~= length(Eq)
-                        l1 = Eq(:, i);
-                        l2 = Eq(:, i+1);
-                        intersect = cross(l1, l2);
-                        intersect = intersect/intersect(3);
-                        points(:,i) = intersect(1:2);
-                        else
-                        l1 = Eq(:, i);
-                        l2 = Eq(:, 1);
-                        intersect = cross(l1, l2);
-                        intersect = intersect/intersect(3);
-                        points(:,i) = intersect(1:2);
-                        end    
-                    end
-                    allPoints((num*2-1):(num*2),:) = points(:, :);
-                    area = polyarea(points(1,:), points(2,:));
-                    % Check if the points are out of bound
-                    if  ~any(any((points<0))) && ~any(points(1,:)>size(image,2)) && ~any(points(2,:)>size(image,1)) 
-                        allAreas(num) = area;
-                    end
-                    num = num + 1;
-                end
-            end
-        end
+    % do this if line is exactly vertical
+    if X1(1) == X2(1) 
+        X1 = X1 + 1;
     end
-     i = find(allAreas == max(allAreas));
-     points = allPoints((i*2-1):(i*2), :);
+    eq(:,4) = [-(X2(2)-X1(2))/(X2(1)-X1(1)); 1; (X2(2)-X1(2))/(X2(1)-X1(1))*X1(1) - X1(2)];
     
-
+    
+    % Find intersection of lines (corners) between the 4 random candidates
+    points = zeros(2,4);   % first row: x-coordinate of the points, second row: y-coordinate
+    for i = 1:1:length(eq)
+        
+        if i ~= length(eq)
+            l1 = eq(:, i);
+            l2 = eq(:, i+1);
+            intersect = cross(l1, l2);
+            intersect = intersect/intersect(3);
+            points(:,i) = intersect(1:2);
+        else
+            l1 = eq(:, i);
+            l2 = eq(:, 1);
+            intersect = cross(l1, l2);
+            intersect = intersect/intersect(3);
+            points(:,i) = intersect(1:2);
+        end
+        
+    end
+    
+    % check whether these points are better candidates for corners
+    % area cannot be too big, all points must be within the image pixels
+    area = polyarea(points(1,:), points(2,:));
+    if area > max_area && ~isnan(area) && ~any(any((points<0))) && ...
+            ~any(points(1,:)>size(image,2)) && ~any(points(2,:)>size(image,1)) 
+        max_area = area;
+        max_points = points;
+    end
+    
+end
+points = max_points;
 
 %% Plot Hough lines & corners
 
@@ -152,8 +138,8 @@ if displayFigures
         plot(xy(1,1),xy(1,2),'x','LineWidth',2,'markersize', 20, 'Color','yellow');
         plot(xy(2,1),xy(2,2),'x','LineWidth',2,'markersize', 20, 'Color','red');
     end
-    title('image with multiple line candidates')
-    
+    title(['image with multiple line candidates, area = ' int2str(max_area)])
+   
     figure
     imshow(image)
     hold on

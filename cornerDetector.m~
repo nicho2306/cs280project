@@ -8,25 +8,41 @@ function points = cornerDetector(image, displayFigures)
 %    points = array of (x,y) coordinates of the 4 corners detected
 
 %% convert to grayscale, lowpass filter, edge filter
-I = rgb2gray(image);
-%I = medfilt2(I);
-I = imgaussfilt(I,2.5);
-BW = edge(I, 'Canny', 0.3);
+LINES = 0;
+threshold = 0.3;
+gthreshold= 2.5;
+% If hough transform return less than 4 lines, reduce threshold for canny
+% edge detector, and try again
+while size(LINES,2) < 4
+    I = rgb2gray(image);
+    %I = medfilt2(I);
+    I = imgaussfilt(I,gthreshold);
+    BW = edge(I, 'Canny', threshold);
 
-%% Hough transform
-[H,T,R] = hough(BW);
-P = houghpeaks(H,10,'threshold',ceil(0.3*max(H(:))));
-LINES = houghlines(BW,T,R,P, 'FillGap',10000000000,'MinLength',1);
+    % Hough transform
+    [H,T,R] = hough(BW);
+    P = houghpeaks(H,10,'threshold',ceil(threshold*max(H(:))));
+    LINES = houghlines(BW,T,R,P, 'FillGap',1000000000,'MinLength',5);
+    threshold = threshold/2;
+    gthreshold = 1.5*gthreshold;
+    %figure
+    %imshow(BW)
+    %title(['LINES = ' int2str(size(LINES,2))])
+end
+
+%% 1, 2, 3, 7
+
 
 %% Find equation of lines
 max_area = 0;
 max_points = zeros(2,4);
 
 % random sample ~210 combinations of 10 lines
-for ii =1:1000
+%for ii =1:100
     % randomly get 4 candidate lines
     possibleK = 1:size(LINES,2);
     K = datasample(possibleK, 4,'Replace',false);
+    K = [1,2, 3, 7];
     lines = LINES(K);
     
     eq = zeros(3,length(lines));
@@ -65,6 +81,7 @@ for ii =1:1000
     i = i(randi(length(i)));
     X1 = lines(i).point1'; %(x1,y1)'
     X2 = lines(i).point2'; %(x2,y2)'
+    if X1(1) == X
     eq(:,4) = [-(X2(2)-X1(2))/(X2(1)-X1(1)); 1; (X2(2)-X1(2))/(X2(1)-X1(1))*X1(1) - X1(2)];
     
     
@@ -87,6 +104,7 @@ for ii =1:1000
         end
         
     end
+    points
     
     % check whether these points are better candidates for corners
     % area cannot be too big, all points must be within the image pixels
@@ -97,7 +115,7 @@ for ii =1:1000
         max_points = points;
     end
     
-end
+%end
 points = max_points;
 
 %% Plot Hough lines & corners
@@ -106,6 +124,18 @@ if displayFigures
     figure
     imshow(BW)
     title('edges of image')
+    %%
+      figure
+    imshow(BW)
+    hold on
+    for k = 1:length(LINES)
+        xy = [LINES(K(k)).point1; LINES(K(k)).point2];
+        plot(xy(:,1),xy(:,2),'LineWidth',2,'Color','green');
+        % Plot beginnings and ends of lines
+        plot(xy(1,1),xy(1,2),'x','LineWidth',2,'markersize', 20, 'Color','yellow');
+        plot(xy(2,1),xy(2,2),'x','LineWidth',2,'markersize', 20, 'Color','red');
+    end
+    %%
     
     figure
     imshow(BW)
@@ -117,8 +147,8 @@ if displayFigures
         plot(xy(1,1),xy(1,2),'x','LineWidth',2,'markersize', 20, 'Color','yellow');
         plot(xy(2,1),xy(2,2),'x','LineWidth',2,'markersize', 20, 'Color','red');
     end
-    title('image with multiple line candidates')
-    
+    title(['image with multiple line candidates, area = ' int2str(max_area)])
+    %%
     figure
     imshow(image)
     hold on
