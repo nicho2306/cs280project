@@ -3,7 +3,6 @@ clear all, close all
 filename = './pictures/cornersDataSet.csv';
 corners_dataset = csvread(filename,1,1);
 num_images = size(corners_dataset, 1) - 1;
-num_images = 16 - 1;
 
 %% Check corner detector accuracy over all dataset
 good_counts = 0;
@@ -40,7 +39,7 @@ end
 accuracy = good_counts/(num_images + 1)
 
 %%
-i = 11; % choose an index for the image to load
+i = 46; % choose an index for the image to load
 name = int2str(i);
 image = imread(['./pictures/' name '.jpg']);
 cornerDetector(image, true);
