@@ -7,7 +7,7 @@ num_images = size(corners_dataset, 1) - 1;
 %% Check corner detector accuracy over all dataset
 good_counts = 0;
 bad_images = [];
-for i=0:num_images
+for i=17:34
     name = int2str(i);
     image = imread(['./pictures/' name '.jpg']);
     c_points = cornerDetector(image, false);
