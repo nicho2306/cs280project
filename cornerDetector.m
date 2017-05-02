@@ -136,7 +136,6 @@ if displayFigures
     end
     title(['image with multiple line candidates, area = ' int2str(max_area)])
    
-    figure
     displayCorners(image, points);
     title('image with corners')
    

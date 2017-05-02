@@ -7,7 +7,7 @@ num_images = size(corners_dataset, 1) - 1;
 %% Check corner detector accuracy over all dataset
 good_counts = 0;
 bad_images = [];
-for i=35:49
+for i=0:num_images
     name = int2str(i);
     image = imread(['./pictures/' name '.jpg']);
     c_points = cornerDetector(image, false);
@@ -20,25 +20,20 @@ for i=35:49
         % store all images that don't get good corners
         bad_images = [bad_images i];
         % show the image that has bad corner prediction
-        displayCorners(image, c_points);
-        title(['image ', name, ' with bad corners'])
+        %displayCorners(image, c_points);
+        %title(['image ', name, ' with bad corners'])
 
     end
     good_counts = good_counts + good_pred;
 end
 
-accuracy = good_counts/(14 + 1)
+accuracy = good_counts/num_images
 
-%%
+%% scanner: 
 close all
-i = 48; % choose an index for the image to load
+i = 16; % choose an index for the image to load
 name = int2str(i);
 image = imread(['./pictures/' name '.jpg']);
-cornerDetector(image, true);
-%%
-figure
-imshow(image)
-title('original image')
 
 % Process the image
 displayFigures = true;
