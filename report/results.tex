@@ -1,28 +1,10 @@
 \section{Results}
 \label{sec:results}
-This section will summarize our results maybe in a table like~\ref{tab:example}.
-And maybe some largerer figures like~\ref{fig:short}.
+We tested our algorithm on a set of 50 manually annotated images of books, and papers.
+The image set had a variety of backgrounds, colors, and lighting.
+We tuned the parameters of our algorithm across all the images such that for the final test run we used the same parameters for all images.
 
-\begin{figure*}
-\begin{center}
-\fbox{\rule{0pt}{2in} \rule{.9\linewidth}{0pt}}
-\end{center}
-   \caption{Example of a short caption, which should be centered.}
-\label{fig:short}
-\end{figure*}
-
-\begin{table}
-\begin{center}
-\begin{tabular}{|l|c|}
-\hline
-Method & Frobnability \\
-\hline\hline
-Theirs & Frumpy \\
-Yours & Frobbly \\
-Ours & Makes one's heart Frob\\
-\hline
-\end{tabular}
-\end{center}
-\caption{Results.   Ours is better.}
-\label{tab:example}
-\end{table}
+We categorized images as successes or failures based on the detected corners compared to the annotated corners.
+Results that were within a small margin of the annotated corners counted as successes and otherwise were failures.
+This resulted in an accuracy of 71\% in our image set.
+In the following section we will discuss the failure modes of our algorithm.
